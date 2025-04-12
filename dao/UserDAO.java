@@ -1,51 +1,51 @@
 package dao;
 
-import model.Event;
+import model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
-import java.util.List;
-
-public class EventDAO {
+public class UserDAO {
     private SessionFactory factory;
 
-    public EventDAO() {
+    public UserDAO() {
         factory = new Configuration().configure("hibernate.cfg.xml")
-                .addAnnotatedClass(Event.class)
+                .addAnnotatedClass(User.class)
                 .buildSessionFactory();
     }
 
-    public void addEvent(Event event) {
+    public void saveUser(User user) {
         try (Session session = factory.getCurrentSession()) {
             session.beginTransaction();
-            session.save(event);
+            session.save(user);
             session.getTransaction().commit();
         }
     }
 
-    public List<Event> getAllEvents() {
+    public User getUserByUsername(String username) {
         try (Session session = factory.getCurrentSession()) {
             session.beginTransaction();
-            List<Event> events = session.createQuery("FROM Event", Event.class).getResultList();
+            User user = session.createQuery("FROM User WHERE username = :username", User.class)
+                    .setParameter("username", username)
+                    .uniqueResult();
             session.getTransaction().commit();
-            return events;
+            return user;
         }
     }
 
-    public void updateEvent(Event event) {
+    public void updateUser(User user) {
         try (Session session = factory.getCurrentSession()) {
             session.beginTransaction();
-            session.update(event);
+            session.update(user);
             session.getTransaction().commit();
         }
     }
 
-    public void deleteEvent(int eventId) {
+    public void deleteUser(int userId) {
         try (Session session = factory.getCurrentSession()) {
             session.beginTransaction();
-            Event event = session.get(Event.class, eventId);
-            if (event != null) session.delete(event);
+            User user = session.get(User.class, userId);
+            if (user != null) session.delete(user);
             session.getTransaction().commit();
         }
     }
